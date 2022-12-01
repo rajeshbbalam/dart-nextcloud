@@ -142,8 +142,10 @@ void _handleProp(xml.XmlElement prop, WebDavFile file) {
           DateTime.fromMillisecondsSinceEpoch(int.parse(prop.text) * 1000);
       break;
     case WebDavProps.ncUploadTime:
-      file.uploadedDate =
-          DateTime.fromMillisecondsSinceEpoch(int.parse(prop.text) * 1000);
+      file.uploadedDate = DateTime.fromMillisecondsSinceEpoch(int.parse(prop.text) * 1000);
+      break;
+    case WebDavProps.ocSystemTag:
+      print("WebDavProps.ocSystemTag");
       break;
     default:
       // store with fully qualified name

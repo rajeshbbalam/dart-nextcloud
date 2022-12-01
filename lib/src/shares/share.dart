@@ -234,6 +234,18 @@ List<Share> sharesFromSharesXml(String xmlStr) {
 }
 
 /// Converts the shares xml to a list of share objects
+List<Share> sharesFromSharesJson(Map<String, dynamic> json) {
+  // Initialize a list to store the FileInfo Objects
+  final tree = [];
+  final List data = json['ocs']['data'] as List;
+  // Iterate over the response to find all share elements and parse the information
+  for (final shareJson in data) {
+    tree.add(shareFromShareJson(shareJson as Map<String, dynamic>));
+  }
+  return tree.cast<Share>();
+}
+
+/// Converts the shares xml to a list of share objects
 Share shareFromRequestResponseXml(String xmlStr) {
   // parse the xml using the xml.XmlDocument.parse method
   final xmlDocument = xml.XmlDocument.parse(xmlStr);
@@ -315,5 +327,44 @@ Share shareFromShareXml(xml.XmlElement element) {
     hideDownload: hideDownload,
     password: password,
     url: url,
+  );
+}
+
+/// Converts a share xml a a share object
+Share shareFromShareJson(Map<String, dynamic> json) {
+  Map<String, dynamic>? data = (json['ocs'] != null ? json['ocs']['data'] : json) as Map<String, dynamic>;
+
+  final permissionsNumber = data['permissions'] as int;
+  final permissions = Permissions.fromInt(permissionsNumber);
+
+  return Share(
+    id: data['id'] != null ? int.parse(data['id'] as String) : -1,
+    shareType: data['share_type'] != null ? data['share_type'] as int : -1,
+    uidOwner: data['uid_owner'] != null ? (data['uid_owner'] as String) : '',
+    displaynameOwner: data['displayname_owner'] != null ? (data['displayname_owner'] as String) : '',
+    permissions: permissions,
+    stime: data['stime'] != null ? (data['stime'] as int) : -1,
+    parent: data['parent'] != null ? (data['parent'] as String) : '',
+    expiration: data['expiration'] != null ? DateTime.parse(data['expiration'] as String) : DateTime.now(),
+    token: data['token'] != null ? (data['token'] as String) : '',
+    uidFileOwner: data['uid_file_owner'] != null ? (data['uid_file_owner'] as String) : '',
+    note: data['note'] != null ? (data['note'] as String) : '',
+    label: data['label'] != null ? (data['label'] as String) : '',
+    displaynameFileOwner: data['displayname_file_owner'] != null ? (data['displayname_file_owner'] as String) : '',
+    path: data['path'] != null ? (data['path'] as String) : '',
+    itemType: data['item_type'] != null ? (data['item_type'] as String) : '',
+    mimeType: data['mimetype'] != null ? (data['mimetype'] as String) : '',
+    storageId: data['storage_id'] != null ? (data['storage_id'] as String) : '',
+    storage: data['storage'] != null ? (data['storage'] as int) : -1,
+    itemSource: data['item_source'] != null ? (data['item_source'] as int) : -1,
+    fileSource: data['file_source'] != null ? (data['file_source'] as int) : -1,
+    fileParent: data['file_parent'] != null ? (data['file_parent'] as int) : -1,
+    fileTarget: data['file_target'] != null ? (data['file_target'] as String) : '',
+    shareWith: data['share_with'] != null ? (data['share_with'] as String) : '',
+    shareWithDisplayName: data['share_with_displayname'] != null ? (data['share_with_displayname'] as String) : '',
+    mailSend: data['mail_send'] != null ? (data['mail_send'] as int) : -1,
+    hideDownload: data['hide_download'] != null ? (data['hide_download'] as int) : -1,
+    password: data['password'] != null ? data['password'] as String : '',
+    url: (data['url'] != null ? (data['url'] as String) : '').replaceAll("http", "https"),
   );
 }

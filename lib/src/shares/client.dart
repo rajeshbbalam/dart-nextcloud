@@ -40,14 +40,22 @@ class SharesClient {
       url += '&path=$path';
     }
     final response = await _network.send('GET', url, [200]);
-    return sharesFromSharesXml(response.body);
+    //return sharesFromSharesXml(response.body);
+    if (response.statusCode == 200) {
+      return sharesFromSharesJson(jsonDecode(response.body) as Map<String, dynamic>);
+    }
+    return [];
   }
 
   /// Get a share by [id]
-  Future<Share> getShare(int id) async {
+  Future<Share?> getShare(int id) async {
     final url = _getUrl('/shares/$id');
     final response = await _network.send('GET', url, [200]);
-    return sharesFromSharesXml(response.body).single;
+    //return sharesFromSharesXml(response.body).single;
+    if (response.statusCode == 200) {
+      return sharesFromSharesJson(jsonDecode(response.body) as Map<String, dynamic>).first;
+    }
+    return null;
   }
 
   /// Get a share by [id]
@@ -136,7 +144,8 @@ class SharesClient {
       url += '&password=$password';
     }
     final response = await _network.send('POST', url, [200]);
-    return shareFromRequestResponseXml(response.body);
+    final Map<String, dynamic> json = jsonDecode(response.body) as Map<String, dynamic>;
+    return shareFromShareJson(json);
   }
 
   /// Shares a [path] (dir/file) with a [user]
